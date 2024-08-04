@@ -23,6 +23,7 @@ make -j$(nproc) all
 for f in $SRC/*_fuzzer.cc; do
     fuzzer=$(basename "$f" _fuzzer.cc)
     $CXX $CXXFLAGS -std=c++11 -I"$SRC/libsodium/src/libsodium/include" \
-         "$f" -o "$OUT/${fuzzer}_fuzzer" \
-         "$SRC/libsodium/src/libsodium/.libs/libsodium.a" $LIB_FUZZING_ENGINE
+    -I"$SRC/libsodium/src/libsodium/crypto_pwhash/argon2" \
+    "$f" -o "$OUT/${fuzzer}_fuzzer" \
+    "$SRC/libsodium/src/libsodium/.libs/libsodium.a" $LIB_FUZZING_ENGINE
 done
