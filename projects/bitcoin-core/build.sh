@@ -15,6 +15,9 @@
 #
 ################################################################################
 
+# Print date to embed it into build logs
+date
+
 if [ "$SANITIZER" != "introspector" ]; then
   # Temporarily skip this under introspector
   $SRC/build_cryptofuzz.sh
@@ -26,6 +29,11 @@ cd $SRC/bitcoin-core/
 # This will also force static builds
 if [ "$ARCHITECTURE" = "i386" ]; then
   export BUILD_TRIPLET="i686-pc-linux-gnu"
+
+  # Temp workaround
+  mkdir /usr/local/lib/clang/18/lib/linux
+  ln -s /usr/local/lib/clang/18/lib/i386-unknown-linux-gnu/libclang_rt.asan_static.a /usr/local/lib/clang/18/lib/linux/libclang_rt.asan_static-i386.a
+  ln -s /usr/local/lib/clang/18/lib/i386-unknown-linux-gnu/libclang_rt.asan.a /usr/local/lib/clang/18/lib/linux/libclang_rt.asan-i386.a
 else
   export BUILD_TRIPLET="x86_64-pc-linux-gnu"
 fi
@@ -39,7 +47,7 @@ fi
 # export CXXFLAGS="$CXXFLAGS -flto=thin"
 # export LDFLAGS="-flto=thin"
 
-export CPPFLAGS="-DBOOST_MULTI_INDEX_ENABLE_SAFE_MODE"
+export CPPFLAGS="-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG -DBOOST_MULTI_INDEX_ENABLE_SAFE_MODE"
 
 (
   cd depends
