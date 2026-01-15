@@ -229,4 +229,14 @@ COPY indexer /opt/indexer
 COPY --from=gcr.io/oss-fuzz-base/indexer /indexer/build/indexer /opt/indexer/indexer
 RUN chmod a+x /opt/indexer/indexer /opt/indexer/index_build.py
 
+
+# LLVM 14 for bitcode extraction (LogicFuzz condition extractor)
+RUN apt-get update && \
+wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main" >> /etc/apt/sources.list && \
+apt-get update && \
+apt-get install -y clang-14 llvm-14 && \
+pip3 install wllvm && \
+apt-get clean && rm -rf /var/lib/apt/lists/*
+
 CMD ["compile"]
