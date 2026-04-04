@@ -22,4 +22,10 @@ RUN apt-get update -y && apt-get install -y cmake make pkg-config
 RUN git clone --depth=1 https://github.com/abseil/abseil-cpp
 RUN git clone --depth 1 https://github.com/google/re2
 
+# Pre-install abseil headers for LogicFuzz wllvm compilation
+# (cmake doesn't work well with wllvm wrapper, so we install headers first)
+RUN cd $SRC/abseil-cpp && mkdir -p build && cd build && \
+    cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && \
+    make -j$(nproc) && make install && ldconfig
+
 COPY build.sh $SRC/

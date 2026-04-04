@@ -21,10 +21,13 @@ CXXFLAGS="$CXXFLAGS -O2"
 # https://github.com/abseil/abseil-cpp/issues/1524#issuecomment-1739364093
 # explains why Abseil must be built for fuzzing, not depended on normally.
 # N.B., this is pasted almost verbatim from what libphonenumber does here.
-cd $SRC/abseil-cpp
-mkdir build && cd build
-cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && make -j$(nproc) && make install
-ldconfig
+# Skip if already installed (for LogicFuzz wllvm compatibility - cmake doesn't work with wllvm)
+if [ ! -f /usr/local/include/absl/base/call_once.h ]; then
+    cd $SRC/abseil-cpp
+    mkdir build && cd build
+    cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && make -j$(nproc) && make install
+    ldconfig
+fi
 
 # Second, build and install RE2.
 # N.B., we don't follow the standard incantation for building RE2
