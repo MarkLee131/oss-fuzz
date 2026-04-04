@@ -30,9 +30,6 @@ case $SANITIZER in
     ;;
   memory)
     FLAGS+=("--with-memory-sanitizer")
-    # installing ensurepip takes a while with MSAN instrumentation, so
-    # we disable it here
-    FLAGS+=("--without-ensurepip")
     # -msan-keep-going is needed to allow MSAN's halt_on_error to function
     FLAGS+=("CFLAGS=-mllvm -msan-keep-going=1")
     ;;
@@ -57,6 +54,7 @@ make -j$(nproc)
 make install
 
 cp -R $CPYTHON_INSTALL_PATH $OUT/
+$OUT/cpython-install/bin/python3 -m pip install hypothesis
 
 cd $SRC/library-fuzzers
 make
@@ -64,6 +62,10 @@ make
 cp $SRC/library-fuzzers/fuzzer-html $OUT/
 cp $SRC/library-fuzzers/html.py $OUT/
 zip -j $OUT/fuzzer-html_seed_corpus.zip corp-html/*
+
+cp $SRC/library-fuzzers/fuzzer-xml $OUT/
+cp $SRC/library-fuzzers/xml.py $OUT/
+zip -j $OUT/fuzzer-xml_seed_corpus.zip corp-xml/*
 
 cp $SRC/library-fuzzers/fuzzer-email $OUT/
 cp $SRC/library-fuzzers/email.py $OUT/
@@ -92,7 +94,7 @@ cp $SRC/library-fuzzers/fuzzer-decode.dict $OUT/
 
 cp $SRC/library-fuzzers/fuzzer-ast $OUT/
 cp $SRC/library-fuzzers/ast.py $OUT/
-cp $SRC/library-fuzzers/fuzzer-ast.dict $OUT/
+cp $SRC/cpython/Modules/_xxtestfuzz/dictionaries/fuzz_pycompile.dict $OUT/fuzzer-ast.dict
 # Use CPython source code as seed corpus
 mkdir corp-ast/
 find $SRC/cpython -type f -name '*.py' -size -4097c -exec cp {} corp-ast/ \;
@@ -103,16 +105,30 @@ cp $SRC/library-fuzzers/re.py $OUT/
 
 cp $SRC/library-fuzzers/fuzzer-zipfile $OUT/
 cp $SRC/library-fuzzers/zipfile.py $OUT/
+zip -j $OUT/fuzzer-zipfile_seed_corpus.zip corp-zipfile/*
+
+cp $SRC/library-fuzzers/fuzzer-zipfile-hypothesis $OUT/
+cp $SRC/library-fuzzers/zipfile_hypothesis.py $OUT/
 
 cp $SRC/library-fuzzers/fuzzer-tarfile $OUT/
 cp $SRC/library-fuzzers/tarfile.py $OUT/
+zip -j $OUT/fuzzer-tarfile_seed_corpus.zip corp-tarfile/*
+
+cp $SRC/library-fuzzers/fuzzer-tarfile-hypothesis $OUT/
+cp $SRC/library-fuzzers/tarfile_hypothesis.py $OUT/
 
 cp $SRC/library-fuzzers/fuzzer-configparser $OUT/
 cp $SRC/library-fuzzers/configparser.py $OUT/
+zip -j $OUT/fuzzer-configparser_seed_corpus.zip corp-configparser/*
 
 cp $SRC/library-fuzzers/fuzzer-tomllib $OUT/
 cp $SRC/library-fuzzers/tomllib.py $OUT/
+zip -j $OUT/fuzzer-tomllib_seed_corpus.zip corp-tomllib/*
 
 cp $SRC/library-fuzzers/fuzzer-plistlib $OUT/
 cp $SRC/library-fuzzers/plist.py $OUT/
+
+cp $SRC/library-fuzzers/fuzzer-zoneinfo $OUT/
+cp $SRC/library-fuzzers/zoneinfo.py $OUT/
+zip -j $OUT/fuzzer-zoneinfo_seed_corpus.zip corp-zoneinfo/*
 
